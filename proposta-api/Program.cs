@@ -1,4 +1,9 @@
 
+using AutoMapper;
+using AutoMapper.Configuration;
+using proposta_api.Aplicacao;
+using proposta_api.Dominio.Handlers;
+
 namespace proposta_api
 {
     public class Program
@@ -13,6 +18,16 @@ namespace proposta_api
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            //Configurações adicionais
+            var mappingConfiguration = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new Mappings());
+            });
+
+            builder.Services.AddSingleton(mappingConfiguration.CreateMapper());
+
+            builder.Services.AddScoped<GravacaoPorpostaHandler>();
 
             var app = builder.Build();
 

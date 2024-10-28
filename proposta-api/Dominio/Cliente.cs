@@ -1,6 +1,6 @@
 ﻿namespace proposta_api.Dominio;
 
-public class ClienteDominio
+public class Cliente
 {
     public string Cpf { get; init; }
 
