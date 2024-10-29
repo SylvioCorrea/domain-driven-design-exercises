@@ -9,14 +9,14 @@ public class ValidacaoProposta
         new ConveniadaPermiteRefinanciamento(),
         new AgenteAtivo(),
         new LimiteValorConveniadaUf(),
-        new LimiteDeParcelasPorIdade(),
+        new LimitePrazoPorIdade(),
     ];
 }
 
 public class ConveniadaPermiteRefinanciamento : IValidacaoProposta
 {
     public Result Validar(ValidacaoPropostaContext ctx) => Result.FailureIf(
-        ctx.DadosOperacao.TipoOperacao != TipoOperacao.Refinanciamento
+        ctx.DadosOperacao.TipoOperacao == TipoOperacao.Refinanciamento
         && !ctx.Conveniada.AceitaRefinanciamento,
         "Conveniada não permite operação de refinanciamento.");
 }
@@ -41,7 +41,7 @@ public class LimiteValorConveniadaUf : IValidacaoProposta
     }
 }
 
-public class LimiteDeParcelasPorIdade : IValidacaoProposta
+public class LimitePrazoPorIdade : IValidacaoProposta
 {
     private const int LimiteIdade = 80;
     
