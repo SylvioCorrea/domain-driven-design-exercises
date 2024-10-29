@@ -21,10 +21,19 @@ public class GravacaoPorpostaHandler
         if (await _propostaRepositorio.ClienteTemPropostaAberta(comando.CpfCliente))
             return Result.Failure("Cliente já possui proposta em adamento.");
 
-        if (!await _propostaRepositorio.AgenteAtivo(comando.Agente))
-            return Result.Failure("Agente da proposta não está ativo.");
+        var cliente = await _propostaRepositorio.ObterCliente(comando.CpfCliente);
+        if (cliente.HasValue) return Result.Failure("Cliente não encontrado");
 
-        
+        var dadosOperacao = await _propostaRepositorio.ObterDadosOperacao(comando.IdOperacao);
+        if (dadosOperacao.HasNoValue) return Result.Failure("Não foram encontrados dados da operação");
+
+        var conveniada = await _propostaRepositorio.ObterConveniada(dadosOperacao.Value.Conveniada);
+        if (conveniada.HasNoValue) return Result.Failure("Conveniada não encontrada");
+
+        var agente = await _propostaRepositorio.ObterAgente(dadosOperacao.Value.IdAgente);
+        if (agente.HasNoValue) return Result.Failure("Agente não encontrado");
+
+        var proposta = Proposta.Create(cliente.Value, dadosOperacao.Value, agente.Value, conveniada.Value);
         
         return Result.Success();
     }
