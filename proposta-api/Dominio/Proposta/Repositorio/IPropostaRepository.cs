@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
+using proposta_api.Dominio.Proposta;
 
-namespace proposta_api.Dominio.Repositorio;
+namespace proposta_api.Dominio.Proposta.Repositorio;
 
 public interface IPropostaRepository
 {
@@ -16,5 +17,7 @@ public interface IPropostaRepository
 
     Task<Maybe<Conveniada>> ObterConveniada(int idConveniada);
 
-    Task<bool> InserirProposta(Proposta proposta);
+    Task<Result> InserirProposta(Proposta proposta);
+
+    Task<UnidadeFederativa> ObterUnidadeFederativa(string uf);
 }

@@ -1,6 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 
-namespace proposta_api.Dominio.Repositorio;
+namespace proposta_api.Dominio.Proposta.Repositorio;
 
 public class PropostaRepositoryMock : IPropostaRepository
 {
@@ -14,9 +14,9 @@ public class PropostaRepositoryMock : IPropostaRepository
         return false;
     }
 
-    public async Task<bool> InserirProposta(Proposta proposta)
+    public async Task<Result> InserirProposta(Proposta proposta)
     {
-        return true;
+        return Result.Success();
     }
 
     public async Task<Maybe<Agente>> ObterAgente(string idAgente)
@@ -32,29 +32,47 @@ public class PropostaRepositoryMock : IPropostaRepository
 
     public async Task<Maybe<Cliente>> ObterCliente(string cpf)
     {
+        var uf = new UnidadeFederativa(
+            Uf: "RS",
+            Ddds: ["51", "53", "54", "55"],
+            ValorMaximoConveniada: new Dictionary<int, decimal>
+            {
+                { 20, 10_000.00m }
+            },
+            SomenteAssinaturaHibrida: false
+        );
+
+        var ufNaturalidade = new UnidadeFederativa(
+            Uf: "RS",
+            Ddds: ["51", "53", "54", "55"],
+            ValorMaximoConveniada: new Dictionary<int, decimal>
+            {
+                { 20, 10_000.00m }
+            },
+            SomenteAssinaturaHibrida: false
+        );
+
         var endereco = new Endereco(
-            Rua: "Rua das Flores",
+            Rua: "Rua das Pedras",
             Numero: "123",
             Bairro: "Centro",
             Cidade: "Porto Alegre",
-            Estado: "SP",
+            Uf: uf,
             CEP: "01000-000"
         );
 
-        // Creating an instance of Contato
         var contato = new Contato(
-            Ddd: "11",
+            Ddd: "51",
             Telefone: "987654321",
-            Email: "cliente@example.com"
+            Email: "joao@example.com"
         );
 
-        // Creating an instance of Cliente
         var cliente = new Cliente(
             Cpf: "12345678900",
             Nome: "João da Silva",
             Sexo: "M",
-            DataNascimento: new DateOnly(1985, 5, 23),
-            UfNaturalidade: "RS",
+            DataNascimento: new DateOnly(1960, 5, 23),
+            UfNaturalidade: ufNaturalidade,
             CidadeNaturalidade: "Porto Alegre",
             Endereco: endereco,
             Contato: contato
@@ -67,13 +85,7 @@ public class PropostaRepositoryMock : IPropostaRepository
     {
         var conveniada = new Conveniada(
             IdConveniada: 20,
-            AceitaRefinanciamento: true,
-            LimiteValorPorUf: new Dictionary<string, decimal>
-            {
-                { "RS", 10_000.00m },
-                { "RJ", 15000.00m },
-                { "MG", 18000.00m }
-            }
+            AceitaRefinanciamento: true
         );
 
         return conveniada;
@@ -83,7 +95,7 @@ public class PropostaRepositoryMock : IPropostaRepository
     {
         var dadosOperacao = new DadosOperacao(
             IdOperacao: 123456789,
-            TipoOperacao: "Novo",
+            TipoOperacao: TipoOperacao.Novo,
             Conveniada: 20,
             Rendimento: "1122334455",
             ValorEmprestimo: 5000.00m,
@@ -93,5 +105,20 @@ public class PropostaRepositoryMock : IPropostaRepository
         );
 
         return dadosOperacao;
+    }
+
+    public async Task<UnidadeFederativa> ObterUnidadeFederativa(string uf)
+    {
+        var unidadeFederativa = new UnidadeFederativa(
+            Uf: "RS",
+            Ddds: ["51", "53", "54", "55"],
+            ValorMaximoConveniada: new Dictionary<int, decimal>
+            {
+                { 20, 10_000.00m }
+            },
+            SomenteAssinaturaHibrida: false
+        );
+
+        return unidadeFederativa;
     }
 }

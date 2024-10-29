@@ -1,16 +1,15 @@
 ﻿using CSharpFunctionalExtensions;
+using proposta_api.Dominio.Proposta.Validacao;
 
-namespace proposta_api.Dominio;
+namespace proposta_api.Dominio.Proposta;
 
 public class Proposta
 {
     public Cliente Cliente { get; init; }
 
-    public string Agente { get; init; }
-
     public long IdOperacao { get; init; }
 
-    public string TipoOperacao { get; init; }
+    public TipoOperacao TipoOperacao { get; init; }
 
     public int Conveniada { get; init; }
 
@@ -28,18 +27,17 @@ public class Proposta
 
     private Proposta(
         Cliente cliente,
-        string agente,
         long idOperacao,
-        string tipoOperacao,
+        TipoOperacao tipoOperacao,
         int conveniada,
         string rendimento,
         decimal valorEmprestimo,
         decimal prestacao,
         int prazo,
-        string idAgente)
+        string idAgente,
+        TipoAssinatura tipoAssinatura)
     {
         Cliente = cliente;
-        Agente = agente;
         IdOperacao = idOperacao;
         TipoOperacao = tipoOperacao;
         Conveniada = conveniada;
@@ -48,15 +46,29 @@ public class Proposta
         Prestacao = prestacao;
         Prazo = prazo;
         IdAgente = idAgente;
+        TipoAssinatura = tipoAssinatura;
     }
 
-    public static Result<Proposta> Create(Cliente cliente, DadosOperacao dadosOperacao, Agente agente, Conveniada conveniada)
+    public static Result<Proposta> Create(
+        Cliente cliente,
+        DadosOperacao dadosOperacao,
+        Agente agente,
+        Conveniada conveniada)
     {
-        var result = Result.Combine(Result.Failure("1"), Result.Failure("2"));
+        var validacaoContext = new ValidacaoPropostaContext(cliente, dadosOperacao, agente, conveniada);
+        
+        var validacoes = ValidacaoProposta.ObterValidacoes();
+
+        var resultadoValidacao = Result.Combine(
+            validacoes.Select(v => v.Validar(validacaoContext)));
+        
+        if (resultadoValidacao.IsFailure)
+            return resultadoValidacao.ConvertFailure<Proposta>();
+        
+        var tipoAssinatura = ObterTipoAssinatura(cliente);
 
         return new Proposta(
             cliente: cliente,
-            agente: agente.Loja,
             idOperacao: dadosOperacao.IdOperacao,
             tipoOperacao: dadosOperacao.TipoOperacao,
             conveniada: conveniada.IdConveniada,
@@ -64,8 +76,20 @@ public class Proposta
             valorEmprestimo: dadosOperacao.ValorEmprestimo,
             prestacao: dadosOperacao.Prestacao,
             prazo: dadosOperacao.Prazo,
-            idAgente: agente.IdAgente
+            idAgente: agente.IdAgente,
+            tipoAssinatura: tipoAssinatura
         );
+    }
+
+    public static TipoAssinatura ObterTipoAssinatura(Cliente cliente)
+    {
+        if (cliente.UfNaturalidade.Ddds.Contains(cliente.Contato.Ddd))
+            return TipoAssinatura.Eletronica;
+
+        if (cliente.Endereco.Uf.SomenteAssinaturaHibrida)
+            return TipoAssinatura.Hibrida;
+
+        return TipoAssinatura.Figital;
     }
 }
 
@@ -74,7 +98,7 @@ public record Cliente(
     string Nome,
     string Sexo,
     DateOnly DataNascimento,
-    string UfNaturalidade,
+    UnidadeFederativa UfNaturalidade,
     string CidadeNaturalidade,
     Endereco Endereco,
     Contato Contato
@@ -85,8 +109,15 @@ public record Endereco(
     string Numero,
     string Bairro,
     string Cidade,
-    string Estado,
+    UnidadeFederativa Uf,
     string CEP
+);
+
+public record UnidadeFederativa (
+    string Uf,
+    IEnumerable<string> Ddds,
+    IDictionary<int, decimal> ValorMaximoConveniada,
+    bool SomenteAssinaturaHibrida
 );
 
 public record Contato(
@@ -97,7 +128,7 @@ public record Contato(
 
 public record DadosOperacao(
     long IdOperacao,
-    string TipoOperacao,
+    TipoOperacao TipoOperacao,
     int Conveniada,
     string Rendimento,
     decimal ValorEmprestimo,
@@ -108,8 +139,7 @@ public record DadosOperacao(
 
 public record Conveniada(
     int IdConveniada,
-    bool AceitaRefinanciamento,
-    IDictionary<string, decimal> LimiteValorPorUf
+    bool AceitaRefinanciamento
 );
 
 public record Agente(
@@ -118,9 +148,6 @@ public record Agente(
     bool Ativo
 );
 
-public enum TipoAssinatura
-{
-    Eletronica,
-    Figital,
-    Fisica
-}
+public enum TipoOperacao { Novo, Refinanciamento }
+
+public enum TipoAssinatura { Eletronica, Figital, Hibrida }

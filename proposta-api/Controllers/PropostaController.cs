@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CSharpFunctionalExtensions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using proposta_api.Aplicacao.Requests;
-using proposta_api.Dominio.Comandos;
-using proposta_api.Dominio.Handlers;
+using proposta_api.Dominio.Proposta.Comandos;
+using proposta_api.Dominio.Proposta.Handlers;
 
 namespace proposta_api.Controllers;
 
@@ -12,9 +13,9 @@ namespace proposta_api.Controllers;
 public class PropostaController : ControllerBase
 {
 
-    private readonly GravacaoPorpostaHandler _handler;
+    private readonly GravacaoPropostaHandler _handler;
 
-    public PropostaController(GravacaoPorpostaHandler handler)
+    public PropostaController(GravacaoPropostaHandler handler)
     {
         _handler = handler;
     }
@@ -22,10 +23,12 @@ public class PropostaController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Gravar([FromBody] GravacaoPropostaRequest proposta)
     {
-        var comando = proposta.CriarComando();
+        var result = await GravacaoPropostaComando
+            .Criar(proposta.CpfCliente, proposta.IdOperacao)
+            .Bind(_handler.Handle);
 
-        var resultado = await _handler.Handle(comando.Value);
-        
-        return Ok();
+        return result.IsSuccess
+            ? Ok()
+            : BadRequest(result.Error);
     }
 }

@@ -1,8 +1,5 @@
-
-using AutoMapper;
-using AutoMapper.Configuration;
-using proposta_api.Aplicacao;
-using proposta_api.Dominio.Handlers;
+using proposta_api.Dominio.Proposta.Handlers;
+using proposta_api.Dominio.Proposta.Repositorio;
 
 namespace proposta_api
 {
@@ -20,14 +17,16 @@ namespace proposta_api
             builder.Services.AddSwaggerGen();
 
             //Configurações adicionais
-            var mappingConfiguration = new MapperConfiguration(mc =>
-            {
-                mc.AddProfile(new Mappings());
-            });
+            //var mappingConfiguration = new MapperConfiguration(mc =>
+            //{
+            //    mc.AddProfile(new Mappings());
+            //});
 
-            builder.Services.AddSingleton(mappingConfiguration.CreateMapper());
+            //builder.Services.AddSingleton(mappingConfiguration.CreateMapper());
 
-            builder.Services.AddScoped<GravacaoPorpostaHandler>();
+            builder.Services
+                .AddScoped<GravacaoPropostaHandler>()
+                .AddScoped<IPropostaRepository, PropostaRepositoryMock>();
 
             var app = builder.Build();
 
