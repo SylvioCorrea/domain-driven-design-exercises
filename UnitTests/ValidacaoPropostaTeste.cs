@@ -86,7 +86,7 @@ public class ValidacaoPropostaTeste
         Assert.False(result.IsSuccess);
     }
 
-    private Cliente Cliente()
+    private static Cliente Cliente()
     {
         var uf = new UnidadeFederativa(
             Uf: "RS",
@@ -137,7 +137,7 @@ public class ValidacaoPropostaTeste
         return cliente;
     }
 
-    private DadosOperacao DadosOperacao()
+    private static DadosOperacao DadosOperacao()
     {
         var dadosOperacao = new DadosOperacao(
             IdOperacao: 123456789,
@@ -153,7 +153,7 @@ public class ValidacaoPropostaTeste
         return dadosOperacao;
     }
 
-    private Conveniada Conveniada()
+    private static Conveniada Conveniada()
     {
         var conveniada = new Conveniada(
             IdConveniada: 20,
@@ -163,7 +163,7 @@ public class ValidacaoPropostaTeste
         return conveniada;
     }
 
-    public Agente Agente()
+    public static Agente Agente()
     {
         var agente = new Agente(
             IdAgente: "AGT123",

@@ -7,8 +7,6 @@ public class Proposta
 {
     public Cliente Cliente { get; init; }
 
-    public long IdOperacao { get; init; }
-
     public TipoOperacao TipoOperacao { get; init; }
 
     public int Conveniada { get; init; }
@@ -27,7 +25,6 @@ public class Proposta
 
     private Proposta(
         Cliente cliente,
-        long idOperacao,
         TipoOperacao tipoOperacao,
         int conveniada,
         string rendimento,
@@ -38,7 +35,6 @@ public class Proposta
         TipoAssinatura tipoAssinatura)
     {
         Cliente = cliente;
-        IdOperacao = idOperacao;
         TipoOperacao = tipoOperacao;
         Conveniada = conveniada;
         Rendimento = rendimento;
@@ -69,7 +65,6 @@ public class Proposta
 
         return new Proposta(
             cliente: cliente,
-            idOperacao: dadosOperacao.IdOperacao,
             tipoOperacao: dadosOperacao.TipoOperacao,
             conveniada: conveniada.IdConveniada,
             rendimento: dadosOperacao.Rendimento,
