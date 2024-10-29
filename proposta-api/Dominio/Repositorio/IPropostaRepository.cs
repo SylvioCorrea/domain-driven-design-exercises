@@ -2,13 +2,11 @@
 
 namespace proposta_api.Dominio.Repositorio;
 
-public interface IPropostaRepositorio
+public interface IPropostaRepository
 {
     Task<bool> ClienteTemPropostaAberta(string cpf);
 
     Task<bool> ClienteBloqueado(string cpf);
-
-    Task<bool> AgenteAtivo(string agente);
 
     Task<Maybe<Cliente>> ObterCliente(string cpf);
 
@@ -17,4 +15,6 @@ public interface IPropostaRepositorio
     Task<Maybe<Agente>> ObterAgente(string agente);
 
     Task<Maybe<Conveniada>> ObterConveniada(int idConveniada);
+
+    Task<bool> InserirProposta(Proposta proposta);
 }

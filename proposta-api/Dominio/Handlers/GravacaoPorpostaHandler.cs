@@ -6,9 +6,9 @@ namespace proposta_api.Dominio.Handlers;
 
 public class GravacaoPorpostaHandler
 {
-    private readonly IPropostaRepositorio _propostaRepositorio;
+    private readonly IPropostaRepository _propostaRepositorio;
 
-    public GravacaoPorpostaHandler(IPropostaRepositorio propostaRepositorio)
+    public GravacaoPorpostaHandler(IPropostaRepository propostaRepositorio)
     {
         _propostaRepositorio = propostaRepositorio;
     }
@@ -27,11 +27,11 @@ public class GravacaoPorpostaHandler
         var dadosOperacao = await _propostaRepositorio.ObterDadosOperacao(comando.IdOperacao);
         if (dadosOperacao.HasNoValue) return Result.Failure("Não foram encontrados dados da operação");
 
-        var conveniada = await _propostaRepositorio.ObterConveniada(dadosOperacao.Value.Conveniada);
-        if (conveniada.HasNoValue) return Result.Failure("Conveniada não encontrada");
-
         var agente = await _propostaRepositorio.ObterAgente(dadosOperacao.Value.IdAgente);
         if (agente.HasNoValue) return Result.Failure("Agente não encontrado");
+        
+        var conveniada = await _propostaRepositorio.ObterConveniada(dadosOperacao.Value.Conveniada);
+        if (conveniada.HasNoValue) return Result.Failure("Conveniada não encontrada");
 
         var proposta = Proposta.Create(cliente.Value, dadosOperacao.Value, agente.Value, conveniada.Value);
         
